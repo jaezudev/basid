@@ -1,31 +1,30 @@
-; Basic-ass SID sound driver
-; don't question why
+; BaSID: a basic-ass SID sound driver
+; 2022 by jaezu (jaezudev on github)
 
-; first of all, we need to define some stuff
-; cuz that will make our lives easier
-
+; definitions
 define	freqlo1	$d400
 define	freqhi1	$d401
-define	cr1		$d404
-define	ad1		$d405
-define	sr1		$d406
-define	vol		$d418
+define	wave1	$d404
+define	ad1	$d405
+define	sr1	$d406
+define	vol	$d418
 
-; TODO: code the actual routine
+; max out the volume
+lda #$0f
+sta vol
 
-; select waveform (10h = triangle)
-lda #$10
-sta cr1
-
-; set ADSR (3, 7, 0, 0)
-lda #$37
+; set the ADSR
+lda #$07
 sta ad1
 lda #$00
 sta sr1
 
-; divide frequency into high and low
+; frequency lo-byte and hi-byte
+lda #$45
+sta freqlo1
+lda #$1d
+sta freqhi1
 
-
-; play
-lda #$0f
-sta vol
+; set waveform (triangle = $11)
+lda #$11
+sta wave1
