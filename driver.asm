@@ -1,6 +1,6 @@
 // BaSID: a basic-ass SID sound driver
 
-*=0C00
+*=$0C00
 
 // definitions
 .label freqlo1=$d400
@@ -21,7 +21,7 @@ START:
 		lda #$00
 		sta sr1
 		
-		// frequency lo-.byte and hi-.byte
+		// frequency lo-byte and hi-byte
 		lda #$45
 		sta freqlo1
 		lda #$1d
