@@ -1,30 +1,34 @@
-; BaSID: a basic-ass SID sound driver
-; 2022 by jaezu (jaezudev on github)
+// BaSID: a basic-ass SID sound driver
 
-; definitions
-define	freqlo1	$d400
-define	freqhi1	$d401
-define	wave1	$d404
-define	ad1	$d405
-define	sr1	$d406
-define	vol	$d418
+*=0C00
 
-; max out the volume
-lda #$0f
-sta vol
+// definitions
+.label freqlo1=$d400
+.label freqhi1=$d401
+.label wave1=$d404
+.label ad1=$d405
+.label sr1=$d406
+.label vol=$d418
 
-; set the ADSR
-lda #$07
-sta ad1
-lda #$00
-sta sr1
-
-; frequency lo-byte and hi-byte
-lda #$45
-sta freqlo1
-lda #$1d
-sta freqhi1
-
-; set waveform (triangle = $11)
-lda #$11
-sta wave1
+START:
+		// max out the volume
+		lda #$0f
+		sta vol
+		
+		// set the ADSR
+		lda #$0a
+		sta ad1
+		lda #$00
+		sta sr1
+		
+		// frequency lo-.byte and hi-.byte
+		lda #$45
+		sta freqlo1
+		lda #$1d
+		sta freqhi1
+		
+		// set waveform (triangle = $11)
+		lda #$11
+		sta wave1
+		
+		rts
