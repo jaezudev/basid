@@ -1,10 +1,10 @@
-// BaSID: a basic-ass SID sound driver
-
-*=$0C00
+*=$1000
 
 // CH1 definitions
 .label freqlo1=$d400
 .label freqhi1=$d401
+.label pwlo1=$d402
+.label pwhi1=$d403
 .label wave1=$d404
 .label ad1=$d405
 .label sr1=$d406
@@ -12,6 +12,8 @@
 // CH2 definitions
 .label freqlo2=$d407
 .label freqhi2=$d408
+.label pwlo2=$d409
+.label pwhi2=$d40a
 .label wave2=$d40b
 .label ad2=$d40c
 .label sr2=$d40d
@@ -19,6 +21,8 @@
 // CH3 definitions
 .label freqlo3=$d40e
 .label freqhi3=$d40f
+.label pwlo3=$d410
+.label pwhi3=$d411
 .label wave3=$d412
 .label ad3=$d413
 .label sr3=$d414
