@@ -58,7 +58,25 @@ start:
 		sta sr2
 		sta sr3
 
-loop:
+		/* === INTERRUPT INSTALLMENT TIME === */
+		sei // disable interrupts
+		lda #$1b
+		sta $d011 // enable screen with vertical raster scroll to 7, use 24 rows for screen height
+		ldx #0
+		stx $d012 // vblank interrupt
+		ldy #1
+		sty $d019 // acknowledge any interrupts
+		sty $d01a // enable raster interrupts
+		lda #<irq // install interrupt pt 1
+		ldx #>irq // install interrupt pt 2
+		sta $0314 // install interrupt pt 3
+		stx $0315 // install interrupt pt 4
+		cli // enable interrupts
+		/* === INTERRUPT INSTALLMENT DONE === */
+
+play:
+
+irq:
 		// frequency lo-byte and hi-byte
 		.eval note = ch1Data.get(i)
 		ldx #loBytes.get(note)
@@ -83,6 +101,6 @@ loop:
 		stx wave2
 		sty wave3
 		.eval i++
-		.if (i==ch1Data.size()) {
+		.if (ch1Data.get(i)==255) {
 			rts
 		}
