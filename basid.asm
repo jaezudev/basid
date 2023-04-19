@@ -36,32 +36,39 @@ start:
 *=$1000
 
 MASTER: .byte $0f
-CH1_AD: .byte $44
-CH1_SR: .byte $00
-CH2_AD: .byte $44
-CH2_SR: .byte $00
-CH3_AD: .byte $01
-CH3_SR: .byte $00
+CH1_AD: .byte $00
+CH1_SR: .byte $f0
+CH2_AD: .byte $00
+CH2_SR: .byte $f0
+CH3_AD: .byte $00
+CH3_SR: .byte $f0
 CH1_WV: .byte $11
 CH2_WV: .byte $11
 CH3_WV: .byte $11
-SPEED: .byte $0d
+SPEED: .byte $0b
 
 init:
 	pha
-	lda #MASTER
+	//lda #MASTER
+	lda #$0f
 	sta vol
-	lda #CH1_AD
+	//lda #CH1_AD
+	lda #$00
 	sta ad1
-	lda #CH1_SR
+	//lda #CH1_SR
+	lda #$f0
 	sta sr1
-	lda #CH2_AD
+	//lda #CH2_AD
+	lda #$00
 	sta ad2
-	lda #CH2_SR
+	//lda #CH2_SR
+	lda #$f0
 	sta sr2
-	lda #CH3_AD
+	//lda #CH3_AD
+	lda #$00
 	sta ad3
-	lda #CH3_SR
+	//lda #CH3_SR
+	lda #$f0
 	sta sr3
 	pla
 	lda #$00
@@ -77,7 +84,7 @@ loop2:
 	bne loop2
 	inc counter
 	lda counter
-	cmp #SPEED
+	cmp #$0b
 	bne out
 	lda #$00
 	sta counter
@@ -103,41 +110,40 @@ boop_ch1:
 	sta freqlo1
 	lda NOTETABLE_HIGH,x
 	sta freqhi1
-	lda #CH1_WV
+	//lda #CH1_WV
+	lda #$11
 	sta wave1
 	rts
 
 boop_ch2:
 	lda CH2_DATA,y
 	tax
-	stx $d429
 	lda NOTETABLE_LOW,x
 	sta freqlo2
 	lda NOTETABLE_HIGH,x
 	sta freqhi2
-	lda #CH2_WV
+	//lda #CH2_WV
+	lda #$11
 	sta wave2
 	rts
 
 boop_ch3:
 	lda CH3_DATA,y
 	tax
-	stx $d42a
 	lda NOTETABLE_LOW,x
 	sta freqlo3
 	lda NOTETABLE_HIGH,x
 	sta freqhi3
-	lda #CH3_WV
+	//lda #CH3_WV
+	lda #$11
 	sta wave3
 	rts
 
 endprg:
-	//jmp $fce2
 	lda #$00
 	sta wave1
 	sta wave2
 	sta wave3
-	cli
 	jmp $a714
 
 CH1_DATA:
