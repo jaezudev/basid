@@ -36,40 +36,52 @@ start:
 *=$1000
 
 MASTER: .byte $0f
-CH1_AD: .byte $00
-CH1_SR: .byte $f0
-CH2_AD: .byte $00
-CH2_SR: .byte $f0
-CH3_AD: .byte $00
-CH3_SR: .byte $f0
-CH1_WV: .byte $11
-CH2_WV: .byte $11
-CH3_WV: .byte $11
+CH1_AD: .byte $03
+CH1_SR: .byte $c0
+CH2_AD: .byte $03
+CH2_SR: .byte $c0
+CH3_AD: .byte $03
+CH3_SR: .byte $c0
+CH1_WV: .byte $41
+CH2_WV: .byte $41
+CH3_WV: .byte $41
+CH1_PL: .byte $00
+CH1_PH: .byte $08
+CH2_PL: .byte $00
+CH2_PH: .byte $08
+CH3_PL: .byte $00
+CH3_PH: .byte $08
+
 SPEED: .byte $0b
 
 init:
 	pha
-	//lda #MASTER
-	lda #$0f
+	lda MASTER
 	sta vol
-	//lda #CH1_AD
-	lda #$00
+	lda CH1_AD
 	sta ad1
-	//lda #CH1_SR
-	lda #$f0
+	lda CH1_SR
 	sta sr1
-	//lda #CH2_AD
-	lda #$00
+	lda CH2_AD
 	sta ad2
-	//lda #CH2_SR
-	lda #$f0
+	lda CH2_SR
 	sta sr2
-	//lda #CH3_AD
-	lda #$00
+	lda CH3_AD
 	sta ad3
-	//lda #CH3_SR
-	lda #$f0
+	lda CH3_SR
 	sta sr3
+	lda CH1_PL
+	sta pwlo1
+	lda CH1_PH
+	sta pwhi1
+	lda CH2_PL
+	sta pwlo2
+	lda CH2_PH
+	sta pwhi2
+	lda CH3_PL
+	sta pwlo3
+	lda CH3_PH
+	sta pwhi3
 	pla
 	lda #$00
 	sta counter
@@ -112,8 +124,7 @@ boop_ch1:
 	sta freqlo1
 	lda NOTETABLE_HIGH,x
 	sta freqhi1
-	//lda #CH1_WV
-	lda #$11
+	lda CH1_WV
 	sta wave1
 	rts
 
@@ -124,8 +135,7 @@ boop_ch2:
 	sta freqlo2
 	lda NOTETABLE_HIGH,x
 	sta freqhi2
-	//lda #CH2_WV
-	lda #$11
+	lda CH2_WV
 	sta wave2
 	rts
 
@@ -136,8 +146,7 @@ boop_ch3:
 	sta freqlo3
 	lda NOTETABLE_HIGH,x
 	sta freqhi3
-	//lda #CH3_WV
-	lda #$11
+	lda CH3_WV
 	sta wave3
 	rts
 
