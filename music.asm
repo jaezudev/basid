@@ -1,4 +1,10 @@
-#importonce 
-.var ch1Data = List().add(48, 50, 52, 53, 55, 57, 59, 60, 255).lock()
-.var ch2Data = List().add(52, 53, 55, 57, 59, 60, 62, 64, 255).lock()
-.var ch3Data = List().add(55, 57, 59, 60, 62, 64, 66, 67, 255).lock()
+#importonce
+CH1_DATA:
+	.byte $30, $32, $34, $35, $37, $39, $3b, $3c
+	.byte $ff
+CH2_DATA:
+	.byte $34, $35, $37, $39, $3b, $3c, $3e, $40
+	.byte $ff
+CH3_DATA:
+	.byte $37, $39, $3b, $3c, $3e, $40, $42, $43
+	.byte $ff

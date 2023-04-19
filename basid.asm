@@ -1,106 +1,171 @@
-*=$1000
-
-// import the music data
-#import "music.asm"
-
-// CH1 definitions
 .label freqlo1=$d400
 .label freqhi1=$d401
-.label pwlo1=$d402
-.label pwhi1=$d403
-.label wave1=$d404
-.label ad1=$d405
-.label sr1=$d406
-
-// CH2 definitions
 .label freqlo2=$d407
 .label freqhi2=$d408
-.label pwlo2=$d409
-.label pwhi2=$d40a
-.label wave2=$d40b
-.label ad2=$d40c
-.label sr2=$d40d
-
-// CH3 definitions
 .label freqlo3=$d40e
 .label freqhi3=$d40f
+.label pwlo1=$d402
+.label pwhi1=$d403
+.label pwlo2=$d409
+.label pwhi2=$d40a
 .label pwlo3=$d410
 .label pwhi3=$d411
+.label wave1=$d404
+.label wave2=$d40b
 .label wave3=$d412
+.label ad1=$d405
+.label sr1=$d406
+.label ad2=$d40c
+.label sr2=$d40d
 .label ad3=$d413
 .label sr3=$d414
-
-// General SID stuff
 .label vol=$d418
 
-// Notetable
-.var loBytes = List().add(22, 39, 57, 75, 95, 116, 138, 161, 186, 212, 240, 14, 45, 78, 113, 150, 190, 231, 20, 66, 116, 169, 224, 27, 90, 156, 226, 45, 123, 207, 39, 133, 232, 81, 193, 55, 180, 56, 196, 89, 247, 158, 78, 10, 208, 162, 129, 109, 103, 112, 137, 178, 237, 59, 157, 20, 160, 69, 3, 219, 207, 225, 18, 101, 219, 118, 58, 39, 65, 138, 5, 181, 157, 193, 36, 201, 182, 237, 115, 78, 130, 20, 10, 106, 59, 130, 72, 147, 107, 218, 231, 156, 4, 40, 20, 0)
-.var hiBytes = List().add(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 12, 13, 13, 14, 15, 16, 17, 18, 19, 20, 21, 23, 24, 26, 27, 29, 31, 32, 34, 36, 39, 41, 43, 46, 49, 52, 55, 58, 62, 65, 69, 73, 78, 82, 87, 92, 98, 104, 110, 117, 124, 131, 139, 147, 156, 165, 175, 185, 196, 208, 221, 234, 248, 0)
+.label counter=$fa
 
-// Miscellaneous stuff
-.var note = 0
-.var w1 = $11
-.var w2 = $11
-.var w3 = $11
-.var i = 0
+*=$0801
+
+BasicUpstart(start)
+
+*=$0810
 
 start:
-		// max out the volume
-		lda #$0f
-		sta vol
-		// set the ADSR
-		lda #$0a
-		sta ad1
-		sta ad2
-		sta ad3
-		lda #$00
-		sta sr1
-		sta sr2
-		sta sr3
+	jsr init
+	jmp loop1
 
-		/* === INTERRUPT INSTALLMENT TIME === */
-		sei // disable interrupts
-		lda #$1b
-		sta $d011 // enable screen with vertical raster scroll to 7, use 24 rows for screen height
-		ldx #0
-		stx $d012 // vblank interrupt
-		ldy #1
-		sty $d019 // acknowledge any interrupts
-		sty $d01a // enable raster interrupts
-		lda #<irq // install interrupt pt 1
-		ldx #>irq // install interrupt pt 2
-		sta $0314 // install interrupt pt 3
-		stx $0315 // install interrupt pt 4
-		cli // enable interrupts
-		/* === INTERRUPT INSTALLMENT DONE === */
+*=$1000
 
+MASTER: .byte $0f
+CH1_AD: .byte $44
+CH1_SR: .byte $00
+CH2_AD: .byte $44
+CH2_SR: .byte $00
+CH3_AD: .byte $01
+CH3_SR: .byte $00
+CH1_WV: .byte $11
+CH2_WV: .byte $11
+CH3_WV: .byte $11
+SPEED: .byte $0d
+
+init:
+	pha
+	lda #MASTER
+	sta vol
+	lda #CH1_AD
+	sta ad1
+	lda #CH1_SR
+	sta sr1
+	lda #CH2_AD
+	sta ad2
+	lda #CH2_SR
+	sta sr2
+	lda #CH3_AD
+	sta ad3
+	lda #CH3_SR
+	sta sr3
+	pla
+	lda #$00
+	sta counter
+	lda #$00
+	tay
+	rts
+
+loop1:
+	lda #$fb
+loop2:
+	cmp $d012
+	bne loop2
+	inc counter
+	lda counter
+	cmp #SPEED
+	bne out
+	lda #$00
+	sta counter
 play:
+	lda CH1_DATA,y
+	cmp #$ff
+	beq endprg
+	jsr boop_ch1
+	jsr boop_ch2
+	jsr boop_ch3
+	iny
+out:
+	lda $d012
+loop3:
+	cmp $d012
+	beq loop3
+	jmp loop1
 
-irq:
-		// frequency lo-byte and hi-byte
-		.eval note = ch1Data.get(i)
-		ldx #loBytes.get(note)
-		ldy #hiBytes.get(note)
-		stx freqlo1
-		sty freqhi1
-		.eval note = ch2Data.get(i)
-		ldx #loBytes.get(note)
-		ldy #hiBytes.get(note)
-		stx freqlo2
-		sty freqhi2
-		.eval note = ch3Data.get(i)
-		ldx #loBytes.get(note)
-		ldy #hiBytes.get(note)
-		stx freqlo3
-		sty freqhi3
-		// set waveform
-		lda #w1
-		ldx #w2
-		ldy #w3
-		sta wave1
-		stx wave2
-		sty wave3
-		.eval i++
-		.if (ch1Data.get(i)==255) {
-			rts
-		}
+boop_ch1:
+	lda CH1_DATA,y
+	tax
+	lda NOTETABLE_LOW,x
+	sta freqlo1
+	lda NOTETABLE_HIGH,x
+	sta freqhi1
+	lda #CH1_WV
+	sta wave1
+	rts
+
+boop_ch2:
+	lda CH2_DATA,y
+	tax
+	stx $d429
+	lda NOTETABLE_LOW,x
+	sta freqlo2
+	lda NOTETABLE_HIGH,x
+	sta freqhi2
+	lda #CH2_WV
+	sta wave2
+	rts
+
+boop_ch3:
+	lda CH3_DATA,y
+	tax
+	stx $d42a
+	lda NOTETABLE_LOW,x
+	sta freqlo3
+	lda NOTETABLE_HIGH,x
+	sta freqhi3
+	lda #CH3_WV
+	sta wave3
+	rts
+
+endprg:
+	//jmp $fce2
+	lda #$00
+	sta wave1
+	sta wave2
+	sta wave3
+	cli
+	jmp $a714
+
+CH1_DATA:
+	.byte $30, $32, $34, $35, $37, $39, $3b, $3c
+	.byte $ff
+CH2_DATA:
+	.byte $34, $35, $37, $39, $3b, $3c, $3e, $40
+	.byte $ff
+CH3_DATA:
+	.byte $37, $39, $3b, $3c, $3e, $40, $42, $43
+	.byte $ff
+
+NOTETABLE_LOW:
+	.byte $16, $27, $39, $4b, $5f, $74, $8a, $a1, $ba, $d4, $f0, $0e
+	.byte $2d, $4e, $71, $96, $be, $e7, $14, $42, $74, $a9, $e0, $1b
+	.byte $5a, $9c, $e2, $2d, $7b, $cf, $27, $85, $e8, $51, $c1, $37
+	.byte $b4, $38, $c4, $59, $f7, $9e, $4e, $0a, $d0, $a2, $81, $6d
+	.byte $67, $70, $89, $b2, $ed, $3b, $9d, $14, $a0, $45, $03, $db
+	.byte $cf, $e1, $12, $65, $db, $76, $3a, $27, $41, $8a, $05, $b5
+	.byte $9d, $c1, $24, $c9, $b6, $ed, $73, $4e, $82, $14, $0a, $6a
+	.byte $3b, $82, $48, $93, $6b, $da, $e7, $9c, $04, $28, $14, $00
+
+NOTETABLE_HIGH:
+	.byte $01, $01, $01, $01, $01, $01, $01, $01, $01, $01, $01, $02
+	.byte $02, $02, $02, $02, $02, $02, $03, $03, $03, $03, $03, $04
+	.byte $04, $04, $04, $05, $05, $05, $06, $06, $06, $07, $07, $08
+	.byte $08, $09, $09, $0a, $0a, $0b, $0c, $0d, $0d, $0e, $0f, $10
+	.byte $11, $12, $13, $14, $15, $17, $18, $1a, $1b, $1d, $1f, $20
+	.byte $22, $24, $27, $29, $2b, $2e, $31, $34, $37, $3a, $3e, $41
+	.byte $45, $49, $4e, $52, $57, $5c, $62, $68, $6e, $75, $7c, $83
+	.byte $8b, $93, $9c, $a5, $af, $b9, $c4, $d0, $dd, $ea, $f8, $00

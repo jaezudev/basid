@@ -2,7 +2,10 @@
 basic sid "sound driver"
 
 ## Functionality
-It can play a ~~note~~ C major chord! Still groundbreaking stuff, I know
+What horrible atrocity have I created
 
 ## How to compile
-Compile using [KickAss](http://theweb.dk/KickAssembler/Main.html#frontpage).
+Compile using the latest version of [KickAssembler](http://theweb.dk/KickAssembler/Main.html#frontpage).
+
+## Contributing
+If you really to fiddle with this utter mess of code, then go ahead and make a pull request.

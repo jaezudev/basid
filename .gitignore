@@ -1,0 +1,5 @@
+.vscode/
+BaSID.code-workspace
+bin/
+.source.txt
+buildlog.txt
