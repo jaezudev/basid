@@ -92,6 +92,8 @@ play:
 	lda CH1_DATA,y
 	cmp #$ff
 	beq endprg
+	cmp #$fe
+	beq restartplay
 	jsr boop_ch1
 	jsr boop_ch2
 	jsr boop_ch3
@@ -145,16 +147,11 @@ endprg:
 	sta wave2
 	sta wave3
 	jmp $a714
+restartplay:
+	ldy #$00
+	jmp play
 
-CH1_DATA:
-	.byte $30, $32, $34, $35, $37, $39, $3b, $3c
-	.byte $ff
-CH2_DATA:
-	.byte $34, $35, $37, $39, $3b, $3c, $3e, $40
-	.byte $ff
-CH3_DATA:
-	.byte $37, $39, $3b, $3c, $3e, $40, $42, $43
-	.byte $ff
+#import "music.asm"
 
 NOTETABLE_LOW:
 	.byte $16, $27, $39, $4b, $5f, $74, $8a, $a1, $ba, $d4, $f0, $0e
