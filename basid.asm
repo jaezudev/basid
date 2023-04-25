@@ -35,8 +35,6 @@ start:
 
 *=$1000
 
-SPEED: .byte $0b
-
 init:
 	pha
 	lda MASTER
@@ -77,15 +75,11 @@ play0:
 	beq endprg
 	cmp #$fe
 	beq restartplay
-	dec wave1
-	dec wave2
-	dec wave3
 	jsr boop_ch1
 	jsr boop_ch2
 	jsr boop_ch3
 	iny
 loop1:
-	sty $0400
 	lda #$fb
 loop2:
 	cmp $d012
@@ -102,9 +96,6 @@ play:
 	beq endprg
 	cmp #$fe
 	beq restartplay
-	dec wave1
-	dec wave2
-	dec wave3
 	jsr boop_ch1
 	jsr boop_ch2
 	jsr boop_ch3
@@ -133,6 +124,7 @@ boop_ch1:
 	cmp #$fd
 	beq unboop_ch1
 	tax
+	dec wave1
 	lda NOTETABLE_LOW,x
 	sta freqlo1
 	lda NOTETABLE_HIGH,x
@@ -152,6 +144,7 @@ boop_ch2:
 	cmp #$fd
 	beq unboop_ch2
 	tax
+	dec wave2
 	lda NOTETABLE_LOW,x
 	sta freqlo2
 	lda NOTETABLE_HIGH,x
@@ -171,6 +164,7 @@ boop_ch3:
 	cmp #$fd
 	beq unboop_ch3
 	tax
+	dec wave3
 	lda NOTETABLE_LOW,x
 	sta freqlo3
 	lda NOTETABLE_HIGH,x

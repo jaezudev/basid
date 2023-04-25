@@ -1,4 +1,5 @@
 #importonce
+SPEED: .byte $0b
 MASTER: .byte $0f
 CH1_AD: .byte $09
 CH1_SR: .byte $70
