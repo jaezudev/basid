@@ -86,7 +86,7 @@ loop2:
 	bne loop2
 	inc counter
 	lda counter
-	cmp #$0b
+	cmp SPEED
 	bne out
 	lda #$00
 	sta counter
