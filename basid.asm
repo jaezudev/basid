@@ -31,26 +31,9 @@ BasicUpstart(start)
 
 start:
 	jsr init
-	jmp loop1
+	jmp play0
 
 *=$1000
-
-MASTER: .byte $0f
-CH1_AD: .byte $03
-CH1_SR: .byte $c0
-CH2_AD: .byte $03
-CH2_SR: .byte $c0
-CH3_AD: .byte $03
-CH3_SR: .byte $c0
-CH1_WV: .byte $41
-CH2_WV: .byte $41
-CH3_WV: .byte $41
-CH1_PL: .byte $00
-CH1_PH: .byte $08
-CH2_PL: .byte $00
-CH2_PH: .byte $08
-CH3_PL: .byte $00
-CH3_PH: .byte $08
 
 SPEED: .byte $0b
 
@@ -85,11 +68,24 @@ init:
 	pla
 	lda #$00
 	sta counter
-	lda #$00
 	tay
 	rts
 
+play0:
+	lda CH1_DATA,y
+	cmp #$ff
+	beq endprg
+	cmp #$fe
+	beq restartplay
+	dec wave1
+	dec wave2
+	dec wave3
+	jsr boop_ch1
+	jsr boop_ch2
+	jsr boop_ch3
+	iny
 loop1:
+	sty $0400
 	lda #$fb
 loop2:
 	cmp $d012
@@ -106,6 +102,9 @@ play:
 	beq endprg
 	cmp #$fe
 	beq restartplay
+	dec wave1
+	dec wave2
+	dec wave3
 	jsr boop_ch1
 	jsr boop_ch2
 	jsr boop_ch3
@@ -117,39 +116,6 @@ loop3:
 	beq loop3
 	jmp loop1
 
-boop_ch1:
-	lda CH1_DATA,y
-	tax
-	lda NOTETABLE_LOW,x
-	sta freqlo1
-	lda NOTETABLE_HIGH,x
-	sta freqhi1
-	lda CH1_WV
-	sta wave1
-	rts
-
-boop_ch2:
-	lda CH2_DATA,y
-	tax
-	lda NOTETABLE_LOW,x
-	sta freqlo2
-	lda NOTETABLE_HIGH,x
-	sta freqhi2
-	lda CH2_WV
-	sta wave2
-	rts
-
-boop_ch3:
-	lda CH3_DATA,y
-	tax
-	lda NOTETABLE_LOW,x
-	sta freqlo3
-	lda NOTETABLE_HIGH,x
-	sta freqhi3
-	lda CH3_WV
-	sta wave3
-	rts
-
 endprg:
 	lda #$00
 	sta wave1
@@ -159,6 +125,63 @@ endprg:
 restartplay:
 	ldy #$00
 	jmp play
+
+boop_ch1:
+	lda CH1_DATA,y
+	cmp #$fc
+	beq dooq_ch1
+	cmp #$fd
+	beq unboop_ch1
+	tax
+	lda NOTETABLE_LOW,x
+	sta freqlo1
+	lda NOTETABLE_HIGH,x
+	sta freqhi1
+	lda CH1_WV
+	sta wave1
+	rts
+unboop_ch1:
+	dec wave1
+dooq_ch1:
+	rts
+
+boop_ch2:
+	lda CH2_DATA,y
+	cmp #$fc
+	beq dooq_ch2
+	cmp #$fd
+	beq unboop_ch2
+	tax
+	lda NOTETABLE_LOW,x
+	sta freqlo2
+	lda NOTETABLE_HIGH,x
+	sta freqhi2
+	lda CH2_WV
+	sta wave2
+	rts
+unboop_ch2:
+	dec wave2
+dooq_ch2:
+	rts
+
+boop_ch3:
+	lda CH3_DATA,y
+	cmp #$fc
+	beq dooq_ch3
+	cmp #$fd
+	beq unboop_ch3
+	tax
+	lda NOTETABLE_LOW,x
+	sta freqlo3
+	lda NOTETABLE_HIGH,x
+	sta freqhi3
+	lda CH3_WV
+	sta wave3
+	rts
+unboop_ch3:
+	dec wave3
+dooq_ch3:
+	rts
 
 #import "music.asm"
 
