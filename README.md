@@ -1,3 +1,5 @@
+WARNING: Project has moved to https://codeberg.org/jaezu/basid
+---
 # BaSID
 basic sid "sound driver"
 
